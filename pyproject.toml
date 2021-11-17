@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "reaction-diffusion"
+version = "0.1.0"
+description = "Demo for computing reaction-diffusion systems after Pearson 1993"
+authors = ["Johan Hidding <j.hidding@esciencecenter.nl>"]
+license = "Apache 2"
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.10"
+numba = "^0.54.1"
+numpy = "^1.20"
+matplotlib = "^3.5.0"
+jupyterlab = "^3.2.3"
+tqdm = "^4.62.3"
+ipywidgets = "^7.6.5"
+snakemake = "^6.10.0"
+h5py = "^3.6.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
