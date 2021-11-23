@@ -1,9 +1,6 @@
-from __future__ import annotations
-from dataclasses import dataclass
 import numpy as np
-from numba import njit
-from tqdm import tqdm
 import h5py as h5
+from numba import njit
 
 
 @njit
