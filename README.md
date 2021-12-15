@@ -116,6 +116,7 @@ def run_model(k, F, t_end=10_000, write_interval=20, shape=(256, 256)):
 ## Exercise
 Write a parameter scan in Snakemake. Let $k$ vary between 0.03 and 0.07, and $F$ between 0.0 and 0.08.
 
+- hint 0: How much RAM would you need to fit the entire parameter scan in memory, supposing you scan the parameters on a 12x12 grid?
 - hint 1: You need to store each output of `run_model`, preferably in an HDF5 file, so that you can add attributes.
 - hint 2: Familiarize yourself with **wildcards** in Snakemake, as well as the `expand` function.
 - hint 3: Create some arrays that contain the parameters you want to scan, then store the index to these arrays in the HDF5 file. This way you can always find back which part of the parameter scan is in which file.
