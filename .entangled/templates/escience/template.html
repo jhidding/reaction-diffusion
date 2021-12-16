@@ -70,24 +70,4 @@ $include-after$
 $endfor$
 </div>
 </body>
-<!-- This script scrolls the page to top when a link in the TOC is clicked. -->
-<script>
-   var elems = document.getElementById("TOC").querySelectorAll("a");
-   for (var i = 0; i < elems.length; ++i) {
-      elems[i].addEventListener("click", clickFunc);
-   }
-   function clickFunc(e) {
-      e.preventDefault();
-      window.location.hash = this.hash;
-      window.scrollTo(0, 0); 
-   }
-</script>
-   <!-- Set the default landing page. Sections are set display: none by default
-        except for the one that is currently the location hash. -->
-   <script type="text/javascript">
-           if (document.location.hash == "" || document.location.hash == "#") {
-                document.location.hash = "#$landing-page$";
-                window.scrollTo(0, 0); 
-           }
-  </script>
 </html>

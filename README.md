@@ -81,6 +81,7 @@ def laplacian(x: np.array):
     return y
 ```
 
+## Initial conditions
 Pearson describes the initial conditions as starting out $U=1$, $V=0$ everywhere except a group of cells in the center of the box, where $U=1/2$ and $V=1/4$. To break symmetry, a small amount of Gaussian noise is added.
 
 ``` {.python #initial-state}
@@ -99,7 +100,8 @@ def initial_state(shape) -> np.ndarray:
     return np.stack((U, V))
 ```
 
-We can integrate this ODE using the Euler method, note the creative use of the wallrus operator to write the solver in terms of generator comprehensions:
+## Euler integration
+We can integrate this ODE using the Euler method, note the creative use of the walrus operator to write the solver in terms of generator comprehensions:
 
 ``` {.python #euler-method}
 def euler_method(df, y_init, t_init, t_end, t_step):
@@ -109,6 +111,7 @@ def euler_method(df, y_init, t_init, t_end, t_step):
     return (y := y + df(y, t)*t_step for t in times)
 ```
 
+## Running the model
 Now comes the fun part: Pearson proposes to integrate the model for 200,000 time steps! Actually 10,000-20,000 is already enough to see some nice patterns appear. This takes quite a while to compute, even on a modern computer. The `run_model` function computes the Gray-Scott model for several iterations, and stores a selection of time steps into an array.
 
 ``` {.python #run-model}

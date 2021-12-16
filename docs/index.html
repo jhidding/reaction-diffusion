@@ -156,6 +156,8 @@ U + 2V &amp;\to 3V \\ V &amp;\to P.
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>                   <span class="op">+</span> x[(i<span class="op">+</span><span class="dv">1</span>)<span class="op">%</span>m,j] <span class="op">+</span> x[i,(j<span class="op">+</span><span class="dv">1</span>)<span class="op">%</span>n] <span class="op">-</span> <span class="dv">4</span><span class="op">*</span>x[i,j]</span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> y</span></code></pre></div>
 </div>
+<section id="initial-conditions" class="level2">
+<h2>Initial conditions</h2>
 <p>Pearson describes the initial conditions as starting out <span class="math inline">\(U=1\)</span>, <span class="math inline">\(V=0\)</span> everywhere except a group of cells in the center of the box, where <span class="math inline">\(U=1/2\)</span> and <span class="math inline">\(V=1/4\)</span>. To break symmetry, a small amount of Gaussian noise is added.</p>
 <div class="named-code-block">
 <p>«initial-state»</p>
@@ -173,7 +175,10 @@ U + 2V &amp;\to 3V \\ V &amp;\to P.
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.stack((U, V))</span></code></pre></div>
 </div>
-<p>We can integrate this ODE using the Euler method, note the creative use of the wallrus operator to write the solver in terms of generator comprehensions:</p>
+</section>
+<section id="euler-integration" class="level2">
+<h2>Euler integration</h2>
+<p>We can integrate this ODE using the Euler method, note the creative use of the walrus operator to write the solver in terms of generator comprehensions:</p>
 <div class="named-code-block">
 <p>«euler-method»</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> euler_method(df, y_init, t_init, t_end, t_step):</span>
@@ -182,6 +187,9 @@ U + 2V &amp;\to 3V \\ V &amp;\to P.
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    times <span class="op">=</span> (t_init <span class="op">+</span> i<span class="op">*</span>t_step <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_steps))</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (y :<span class="op">=</span> y <span class="op">+</span> df(y, t)<span class="op">*</span>t_step <span class="cf">for</span> t <span class="kw">in</span> times)</span></code></pre></div>
 </div>
+</section>
+<section id="running-the-model" class="level2">
+<h2>Running the model</h2>
 <p>Now comes the fun part: Pearson proposes to integrate the model for 200,000 time steps! Actually 10,000-20,000 is already enough to see some nice patterns appear. This takes quite a while to compute, even on a modern computer. The <code>run_model</code> function computes the Gray-Scott model for several iterations, and stores a selection of time steps into an array.</p>
 <div class="named-code-block">
 <p>«run-model»</p>
@@ -199,6 +207,7 @@ U + 2V &amp;\to 3V \\ V &amp;\to P.
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> result</span></code></pre></div>
 </div>
+</section>
 </section>
 <section id="exercise" class="level1">
 <h1>Exercise</h1>
@@ -245,8 +254,16 @@ U + 2V &amp;\to 3V \\ V &amp;\to P.
                                 <ul>
                                 <li><a href="#about">About</a></li>
                                 <li><a href="#scientific-background">Scientific Background</a></li>
-                                <li><a href="#the-model">The Model</a></li>
-                                <li><a href="#exercise">Exercise</a></li>
+                                <li><a href="#the-model">The Model</a>
+                                <ul>
+                                <li><a href="#initial-conditions">Initial conditions</a></li>
+                                <li><a href="#euler-integration">Euler integration</a></li>
+                                <li><a href="#running-the-model">Running the model</a></li>
+                                </ul></li>
+                                <li><a href="#exercise">Exercise</a>
+                                <ul>
+                                <li><a href="#if-you-have-time-left">If you have time left</a></li>
+                                </ul></li>
                                 </ul>
                 </nav>
         </div> 
@@ -254,24 +271,4 @@ U + 2V &amp;\to 3V \\ V &amp;\to P.
 <div class="footer">
 </div>
 </body>
-<!-- This script scrolls the page to top when a link in the TOC is clicked. -->
-<script>
-   var elems = document.getElementById("TOC").querySelectorAll("a");
-   for (var i = 0; i < elems.length; ++i) {
-      elems[i].addEventListener("click", clickFunc);
-   }
-   function clickFunc(e) {
-      e.preventDefault();
-      window.location.hash = this.hash;
-      window.scrollTo(0, 0); 
-   }
-</script>
-   <!-- Set the default landing page. Sections are set display: none by default
-        except for the one that is currently the location hash. -->
-   <script type="text/javascript">
-           if (document.location.hash == "" || document.location.hash == "#") {
-                document.location.hash = "#";
-                window.scrollTo(0, 0); 
-           }
-  </script>
 </html>

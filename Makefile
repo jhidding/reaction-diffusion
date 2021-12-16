@@ -3,7 +3,7 @@
 theme := escience
 theme_dir := .entangled/templates/$(theme)
 
-pandoc_args += -s -t html5 -f commonmark_x --toc --toc-depth 1
+pandoc_args += -s -t html5 -f commonmark_x --toc --toc-depth 2
 pandoc_args += --template $(theme_dir)/template.html
 pandoc_args += --css theme.css
 pandoc_args += --mathjax
