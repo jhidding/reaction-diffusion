@@ -3,9 +3,10 @@ title: Reaction Diffusion systems and Turing patterns
 author: Johan Hidding
 ---
 
+# About
 This is a demo that shows how to do a parameter scan using Snakemake. We're reproducing results from a paper by [Pearson 1993 (arXiv link)](https://arxiv.org/pdf/patt-sol/9304003.pdf) in Science.
 
-![Parameter scan](pattern_map.png)
+![Parameter scan](fig/pattern_map.png){width="100%"}
 
 Reaction-diffusion systems are not just a theory. With some effort you can create these reactions for real:
 
@@ -23,6 +24,10 @@ from numba import njit
 <<euler-method>>
 <<initial-state>>
 <<run-model>>
+<<parameter-space>>
+
+# Not shown here
+<<a-solution>>
 ```
 
 The paper computes a system by Gray and Scott (1985). The idea is that we have a two-dimensional space with two substances, $U$ and $V$. The substance $V$ is a promotor to turn $U$ into more $V$, and a second reaction slowly turns $V$ into an inert waste product $P$:
@@ -109,12 +114,17 @@ def run_model(k, F, t_end=10_000, write_interval=20, shape=(256, 256)):
     for i, snap in enumerate(comp):
         if i % write_interval == 0:
             result[i // write_interval] = snap
-    
+
     return result
 ```
 
 ## Exercise
-Write a parameter scan in Snakemake. Let $k$ vary between 0.03 and 0.07, and $F$ between 0.0 and 0.08.
+Write a parameter scan in Snakemake. Let $k$ vary between 0.03 and 0.07, and $F$ between 0.0 and 0.08. These computations are quite expensive, so don't make the scan too dense:
+
+``` {.python #parameter-space}
+k_values = np.linspace(0.03, 0.07, 11)
+F_values = np.linspace(0.00, 0.08, 11)
+```
 
 - hint 1: You need to store each output of `run_model`, preferably in an HDF5 file, so that you can add attributes.
 - hint 2: Familiarize yourself with **wildcards** in Snakemake, as well as the `expand` function.
@@ -123,3 +133,41 @@ Write a parameter scan in Snakemake. Let $k$ vary between 0.03 and 0.07, and $F$
 ## If you have time left
 The Euler method is extremely inefficient for diffusion systems. However, implicit methods cannot handle the reaction part of the equations very well. You may want to check out this paper by [Chou et al. 2007](https://www.math.uci.edu/~qnie/Publications/ja29.pdf).
 
+# Solution
+
+``` {.python #a-solution .hide}
+rule map_vis:
+    input:
+        expand("data/k{param_k}-F{param_F}.h5",
+               param_k=[f"{k:02}" for k in range(len(k_values))],
+               param_F=[f"{F:02}" for F in range(len(F_values))])
+    output:
+        "fig/pattern_map.png"
+    run:
+        from matplotlib import pyplot as plt
+        fig, ax = plt.subplots(len(k_values), len(F_values), figsize=(20, 20))
+        for fname in input:
+            with h5.File(fname, "r") as f_in:
+                i = f_in.attrs["k_index"]
+                j = f_in.attrs["F_index"]
+                ax[i,j].imshow(f_in["V"][-1])
+                ax[i,j].set_axis_off()
+        # fig.tight_layout()
+        fig.savefig(output[0], bbox_inches="tight")
+
+
+rule compute_model:
+    output:
+        "data/k{param_k}-F{param_F}.h5"
+    run:
+        k = k_values[int(wildcards.param_k)]
+        F = F_values[int(wildcards.param_F)]
+        result = run_model(k, F)
+        with h5.File(f"{output[0]}", "w") as f_out:
+            f_out.attrs["k"] = k
+            f_out.attrs["F"] = F
+            f_out.attrs["k_index"] = int(wildcards.param_k)
+            f_out.attrs["F_index"] = int(wildcards.param_F)
+            f_out["U"] = result[:, 0]
+            f_out["V"] = result[:, 1]
+```
