@@ -12,6 +12,8 @@ Reaction-diffusion systems are not just a theory. With some effort you can creat
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/LL3kVtc-4vY?start=473" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
+We see patterns in nature all around us. Some of these patterns can be explained by models that are very similar to the Gray-Scott model that we look at here. For example, in arid climates the combination of limited precipitation and animal grazing results in varying patterns of vegetation (see for instance the [work by Max Rietkerk](https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.505.4299&rep=rep1&type=pdf) and collaborators).
+
 This demo needs the following imports:
 
 ``` {.python file=Snakefile}
@@ -126,7 +128,8 @@ k_values = np.linspace(0.03, 0.07, 11)
 F_values = np.linspace(0.00, 0.08, 11)
 ```
 
-- hint 1: You need to store each output of `run_model`, preferably in an HDF5 file, so that you can add attributes.
+- hint 0: How much RAM would you need to fit the entire parameter scan in memory, supposing you scan the parameters on a 12x12 grid?
+- hint 1: You need to store each output of `run_model`, preferably in an HDF5 file, so that you can add attributes, and use your results for later analysis.
 - hint 2: Familiarize yourself with **wildcards** in Snakemake, as well as the `expand` function.
 - hint 3: Create some arrays that contain the parameters you want to scan, then store the index to these arrays in the HDF5 file. This way you can always find back which part of the parameter scan is in which file.
 
