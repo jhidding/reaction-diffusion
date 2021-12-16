@@ -3,10 +3,15 @@ title: Reaction Diffusion systems and Turing patterns
 author: Johan Hidding
 ---
 
-# About
-This is a demo that shows how to do a parameter scan using Snakemake. We're reproducing results from a paper by [Pearson 1993 (arXiv link)](https://arxiv.org/pdf/patt-sol/9304003.pdf) in Science.
+About
+=====
+This is a demo that shows how to do a parameter scan using Snakemake. We're reproducing results from a paper by [Pearson 1993 (arXiv link)](https://arxiv.org/pdf/patt-sol/9304003.pdf) in Science. The goal is to create a figure similar to this:
 
 ![Parameter scan](fig/pattern_map.png){width="100%"}
+
+Scientific Background
+=====================
+The core of these ideas date back to Alan Turing himself. In his [last paper in 1952](https://www.dna.caltech.edu/courses/cs191/paperscs191/turing.pdf) he wrote about the possible origin of pattern formation in chemistry and biology.
 
 Reaction-diffusion systems are not just a theory. With some effort you can create these reactions for real:
 
@@ -14,6 +19,8 @@ Reaction-diffusion systems are not just a theory. With some effort you can creat
 
 We see patterns in nature all around us. Some of these patterns can be explained by models that are very similar to the Gray-Scott model that we look at here. For example, in arid climates the combination of limited precipitation and animal grazing results in varying patterns of vegetation (see for instance the [work by Max Rietkerk](https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.505.4299&rep=rep1&type=pdf) and collaborators).
 
+The Model
+=========
 This demo needs the following imports:
 
 ``` {.python file=Snakefile}
@@ -120,7 +127,8 @@ def run_model(k, F, t_end=10_000, write_interval=20, shape=(256, 256)):
     return result
 ```
 
-## Exercise
+Exercise
+========
 Write a parameter scan in Snakemake. Let $k$ vary between 0.03 and 0.07, and $F$ between 0.0 and 0.08. These computations are quite expensive, so don't make the scan too dense:
 
 ``` {.python #parameter-space}
@@ -128,15 +136,35 @@ k_values = np.linspace(0.03, 0.07, 11)
 F_values = np.linspace(0.00, 0.08, 11)
 ```
 
-- hint 0: How much RAM would you need to fit the entire parameter scan in memory, supposing you scan the parameters on a 12x12 grid?
-- hint 1: You need to store each output of `run_model`, preferably in an HDF5 file, so that you can add attributes, and use your results for later analysis.
-- hint 2: Familiarize yourself with **wildcards** in Snakemake, as well as the `expand` function.
-- hint 3: Create some arrays that contain the parameters you want to scan, then store the index to these arrays in the HDF5 file. This way you can always find back which part of the parameter scan is in which file.
+You need to run `run_model` for every combination of $k$ and $F$, in the example above this would give you 121 models to run. There are two kinds of visualisations that you could make: one is an overview of model outputs like shown at the top, the other would be to make a small movie of a single one of these model runs.
+
+#### hint 0: how does it scale?
+How much RAM would you need to fit the entire parameter scan in memory, supposing you scan the parameters on a 11x11 grid? If your computer is not too fast, try lowering the number of pixels and time frames per model run.
+
+#### hint 1: use HDF5 files
+You need to store each output of `run_model`, preferably in an HDF5 file, so that you can add attributes, and use your results for later analysis. For example, for a single run you may write your output to an HDF5 file like so:
+
+``` {.python}
+k = 0.048
+F = 0.020
+result = run_model(k, F)
+with h5.File("k0048-F0020.h5", "w") as f_out:
+    f_out.attrs["k"] = k
+    f_out.attrs["F"] = F
+    f_out["U"] = result[:, 0]
+    f_out["V"] = result[:, 1]
+```
+
+For more information, check out the [HDF5 Python documentation](https://docs.h5py.org/en/stable/).
+
+#### hint 2: if you're using Snakemake
+Familiarize yourself with [**wildcards** in Snakemake](https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#wildcards), as well as the [`expand` function](https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#the-expand-function).
+
+#### hint 3: don't trust floating points
+Create some arrays that contain the parameters you want to scan, then store the index to these arrays in the HDF5 file. This way you can always find back which part of the parameter scan is in which file.
 
 ## If you have time left
 The Euler method is extremely inefficient for diffusion systems. However, implicit methods cannot handle the reaction part of the equations very well. You may want to check out this paper by [Chou et al. 2007](https://www.math.uci.edu/~qnie/Publications/ja29.pdf).
-
-# Solution
 
 ``` {.python #a-solution .hide}
 rule map_vis:

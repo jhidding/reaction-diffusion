@@ -1,21 +1,24 @@
 .PHONY: site clean watch watch-pandoc watch-browser-sync
 
+theme := escience
+theme_dir := .entangled/templates/$(theme)
+
 pandoc_args += -s -t html5 -f commonmark_x --toc --toc-depth 1
-pandoc_args += --template .entangled/templates/dark.html
-pandoc_args += --css dark.css
+pandoc_args += --template $(theme_dir)/template.html
+pandoc_args += --css theme.css
 pandoc_args += --mathjax
-pandoc_args += --highlight-style .entangled/templates/dark.theme
+# pandoc_args += --highlight-style $(theme_dir)/syntax.theme
 pandoc_args += --section-divs
 pandoc_args += --lua-filter .entangled/scripts/hide.lua
 pandoc_args += --lua-filter .entangled/scripts/annotate.lua
 pandoc_input := README.md 
 pandoc_output := docs/index.html
 
-static_files := .entangled/templates/dark.css .entangled/templates/structure.jpg
-static_targets := $(static_files:.entangled/templates/%=docs/%)
+static_files := $(theme_dir)/theme.css $(theme_dir)/static
+static_targets := $(static_files:$(theme_dir)/%=docs/%)
 figure_files := $(wildcard fig/*)
 figure_targets := $(figure_files:%=docs/%)
-functional_deps := Makefile $(wildcard .entangled/scripts/*.lua) .entangled/templates/dark.html .entangled/templates/dark.theme
+functional_deps := Makefile $(wildcard .entangled/scripts/*.lua) $(theme_dir)/template.html $(theme_dir)/syntax.theme
 
 site: $(pandoc_output) $(static_targets) $(figure_targets)
 
@@ -26,9 +29,10 @@ $(figure_targets): docs/fig/%: fig/%
 	@mkdir -p $(@D)
 	cp $< $@
 
-$(static_targets): docs/%: .entangled/templates/%
+$(static_targets): docs/%: $(theme_dir)/%
 	@mkdir -p $(@D)
-	cp $< $@
+	rm -rf $@
+	cp -r $< $@
 
 docs/index.html: $(pandoc_input) $(functional_deps)
 	@mkdir -p $(@D)
